@@ -149,12 +149,9 @@ Uma das formas mais simples de executar a aplicação com cuda é carregando o c
 
 ```bash
 #!/bin/bash 
-# run_on_superpc.sh
 #SBATCH --job-name=neural_train
-#SBATCH --time=0-0:05
+#SBATCH --time=0-0:15
 #SBATCH --partition=gpu
-# Para selecionar a partição **gpu** adicione o comando `#SBATCH --partition=gpu`
-
 
 echo "loading nvidia container"
 module load singularity
@@ -163,13 +160,15 @@ singularity shell /opt/npad/shared/containers/nvhpc_22.5_devel.sif
 echo "loading your .bashrc"
 source ~/.bashrc
 
+# informando ao tch-rs que desejo compilar com cuda na versão 11.7
+export TORCH_CUDA_VERSION=cu117
+
 cargo r --release
+
 ```
 
 Perceba que ao carregar o shell do container nvidia high computer (nvhcp), todas as variáveis de ambiente são perdidas, sendo necessário
-recarregá-las usando `source ~/.bashrc`. Cargo é o gerenciador de pacotes official da linguagem Rust, perceba que ao executar o comando `cargo r --release`.
-A aplicação cargo irá compilar a aplicação utilizando flags de otimização e irá executar o programa. Caso tenha compilado a aplicação no nó de login, será necessário
-remover a pasta **target**, antes de submeter o script
+recarregá-las usando `source ~/.bashrc`. Cargo é o gerenciador de pacotes official da linguagem Rust, perceba que ao executar o comando `cargo r --release`. A aplicação cargo irá compilar a aplicação utilizando flags de otimização e irá executar o programa. Caso tenha compilado a aplicação no nó de login, será necessário remover a pasta **target**, antes de submeter o script
 
 ```bash
 # rm -rf target # caso tenha compilado a aplicação no nó de login.
