@@ -12,7 +12,10 @@ fn main() -> Result<()> {
     let vs = nn::VarStore::new(device.clone());
     let net = net(&vs.root());
 
-    let dataset = tch::vision::mnist::load_dir("data")?;
+    let dataset = match tch::vision::mnist::load_dir("data") {
+        Ok(d) => d,
+        Err(_) => panic!("Dataset Not found, run the get_inputs.sh !!"),
+    };
     let dataset = dataset_to_device(dataset, &device);
 
     let mut opt = nn::Adam::default().build(&vs, 1e-3)?;
